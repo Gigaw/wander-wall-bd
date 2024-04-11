@@ -7,24 +7,13 @@ const generateAccessToken = (id, roleId) => {
   return sign({ id, roleId }, process.env.TOKEN_SECRET, { expiresIn: "24h" });
 };
 class UserController {
-  async getUser(req, res) {
-    const { name, email, password, phone, img_url } = req.body;
-    // try {
-    //   const user = await User.findById(req.params.id);
-    //   res.json(user);
-    // } catch (error) {
-    //   res.status(500).json({ message: error.message });
-    // }
-  }
-
   async createUser(req, res) {
-    const { name, email, password, phone } = req.body;
-    const userRoleId = 0;
+    const { name, email, password, phone, roleId } = req.body;
 
     try {
       const query = await db.query(
         `INSERT INTO users (name, email, password, phone, role_id) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-        [name, email, password, phone, userRoleId]
+        [name, email, password, phone, roleId]
       );
       res.json(query.rows[0]);
     } catch (error) {
@@ -37,6 +26,15 @@ class UserController {
     const userRoleId = 0;
     const hashedPassword = await bcrypt.hash(password, 7);
     try {
+      const querySameEmail = await db.query(
+        `SELECT * FROM users WHERE email = $1`,
+        [email]
+      );
+
+      if (querySameEmail.rows.length > 0) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
       const query = await db.query(
         `INSERT INTO users (name, email, password, phone, role_id) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
         [name, email, hashedPassword, phone, userRoleId]
@@ -53,7 +51,7 @@ class UserController {
     const { email, password } = req.body;
     try {
       const query = "SELECT * FROM users WHERE email = $1";
-      const result = await pool.query(query, [email]);
+      const result = await db.query(query, [email]);
       if (result.rows.length === 0) {
         // User with provided email not found
         return res.status(401).send("Invalid email or password");
