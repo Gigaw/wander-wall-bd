@@ -1,5 +1,6 @@
 import db from "../db.js";
 import bcrypt from "bcrypt";
+import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 const { sign, verify } = jwt;
 
@@ -22,6 +23,12 @@ class UserController {
   }
 
   async signUp(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res
+        .status(400)
+        .json({ message: "Validation error", errors: errors.errors });
+    }
     const { name, email, password, phone } = req.body;
     const userRoleId = 0;
     const hashedPassword = await bcrypt.hash(password, 7);
@@ -48,6 +55,12 @@ class UserController {
   }
 
   async signIn(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res
+        .status(400)
+        .json({ message: "Validation error", errors: errors.errors });
+    }
     const { email, password } = req.body;
     try {
       const query = "SELECT * FROM users WHERE email = $1";
