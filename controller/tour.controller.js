@@ -1,4 +1,4 @@
-import db from "../bd.js";
+import db from "../db.js";
 
 class TourController {
   async getTours(req, res) {

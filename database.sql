@@ -1,3 +1,11 @@
+create TABLE roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+insert into roles (name) values ('Admin');
+insert into roles (name) values ('User');
+
 create TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -9,13 +17,15 @@ create TABLE users (
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
-create TABLE roles (
+create TABLE levels (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
+    name VARCHAR(100) NOT NULL,
+    points INT NOT NULL
 );
 
-insert into roles (name) values ('Admin');
-insert into roles (name) values ('User');
+insert into levels (name, points) values ('Beginner', 1);
+insert into levels (name, points) values ('Intermediate', 2);
+insert into levels (name, points) values ('Advanced', 3);
 
 create TABLE tours (
     id SERIAL PRIMARY KEY,
@@ -38,16 +48,6 @@ create TABLE favorites (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (tour_id) REFERENCES tours(id)
 );
-
-create TABLE levels (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    points INT NOT NULL
-);
-
-insert into levels (name, points) values ('Beginner', 1);
-insert into levels (name, points) values ('Intermediate', 2);
-insert into levels (name, points) values ('Advanced', 3);
 
 create TABLE reviews (
     id SERIAL PRIMARY KEY,
@@ -80,6 +80,16 @@ create TABLE hikes (
     FOREIGN KEY (tour_id) REFERENCES tours(id)
 );
 
+create TABLE statuses (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL
+);
+
+insert into statuses (name, description) values ('Pending', 'The booking is pending');
+insert into statuses (name, description) values ('Approved', 'The booking is approved');
+insert into statuses (name, description) values ('Rejected', 'The booking is rejected');
+
 create TABLE bookings (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
@@ -89,10 +99,4 @@ create TABLE bookings (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (hike_id) REFERENCES hikes(id),
     FOREIGN KEY (status_id) REFERENCES statuses(id)
-);
-
-create TABLE statuses (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT NOT NULL
 );
