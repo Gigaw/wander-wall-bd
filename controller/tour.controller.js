@@ -21,37 +21,30 @@ class TourController {
   }
 
   async createTour(req, res) {
-    const {
-      name,
-      description,
-      price,
-      img_url,
-      location,
-      duration,
-      distance,
-      map_data,
-      level_id,
-    } = req.body;
+    const { name, description, price, location, duration, distance, level } =
+      req.body;
+    let level_id;
+    console.log("body", req.body);
+    switch (Number(level)) {
+      case 1:
+        level_id = 1;
+        break;
+      case 2:
+        level_id = 2;
+        break;
+      case 3:
+        level_id = 3;
+        break;
+    }
 
     try {
       const query = await db.query(
-        `INSERT INTO tours (name, description, price, img_url,
+        `INSERT INTO tours (name, description, price, 
           location,
           duration,
           distance,
-          map_data,
-          level_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-        [
-          name,
-          description,
-          price,
-          img_url,
-          location,
-          duration,
-          distance,
-          map_data,
-          level_id,
-        ]
+          level_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [name, description, price, location, duration, distance, level_id]
       );
       res.json(query.rows[0]);
     } catch (error) {

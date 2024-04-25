@@ -24,6 +24,7 @@ class UserController {
 
   async signUp(req, res) {
     const errors = validationResult(req);
+    console.log(errors);
     if (!errors.isEmpty()) {
       return res
         .status(400)
@@ -48,7 +49,7 @@ class UserController {
       );
       const user = query.rows[0];
       const token = generateAccessToken(user.id, user.role_id);
-      res.status(200).json({ token });
+      res.status(200).json({ token, user: user });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -78,7 +79,7 @@ class UserController {
       }
       const token = generateAccessToken(user.id, user.role_id);
       // Passwords match, sign-in successful
-      res.status(200).json({ token });
+      res.status(200).json({ token, user: user });
     } catch (error) {
       console.error("Error while signing in:", error);
       res.status(500).send("Error while signing in");
