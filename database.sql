@@ -32,11 +32,11 @@ create TABLE tours (
     name VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    img_url VARCHAR(100) NOT NULL,
+    img_url VARCHAR(100),
     location VARCHAR(100) NOT NULL,
     duration INT NOT NULL,
     distance INT NOT NULL,
-    map_data JSON NOT NULL,
+    map_data JSON,
     level_id INT NOT NULL,
     FOREIGN KEY (level_id) REFERENCES levels(id)
 );
@@ -86,17 +86,16 @@ create TABLE statuses (
     description TEXT NOT NULL
 );
 
-insert into statuses (name, description) values ('Pending', 'The booking is pending');
-insert into statuses (name, description) values ('Approved', 'The booking is approved');
-insert into statuses (name, description) values ('Rejected', 'The booking is rejected');
+insert into statuses (id, name, description) values (1, 'Pending', 'The booking is pending');
+insert into statuses (id, name, description) values (2, 'Approved', 'The booking is approved');
+insert into statuses (id, name, description) values (3, 'Rejected', 'The booking is rejected');
 
 create TABLE bookings (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    hike_id INT NOT NULL,
+    tour_id INT NOT NULL,
     status_id INT NOT NULL,
-    date_created TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (hike_id) REFERENCES hikes(id),
+    FOREIGN KEY (tour_id) REFERENCES tours(id),
     FOREIGN KEY (status_id) REFERENCES statuses(id)
 );

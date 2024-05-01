@@ -24,7 +24,6 @@ class UserController {
 
   async signUp(req, res) {
     const errors = validationResult(req);
-    console.log(errors);
     if (!errors.isEmpty()) {
       return res
         .status(400)
@@ -47,6 +46,8 @@ class UserController {
         `INSERT INTO users (name, email, password, phone, role_id) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
         [name, email, hashedPassword, phone, userRoleId]
       );
+      // const query2 = await db.query(`select users.*, roles.name as role_name from users join roles on users.role_id = roles.id where users.id = $1`, [query.rows[0].id])
+      // select users.*, roles.name as role_name from users join roles on users.role_id = roles.id where users.id = 
       const user = query.rows[0];
       const token = generateAccessToken(user.id, user.role_id);
       res.status(200).json({ token, user: user });
