@@ -1,5 +1,4 @@
 import express from "express";
-import userRouter from "./routes/user.rotes.js";
 import tourRouter from "./routes/tour.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import bookingRouter from "./routes/booking.routes.js";
@@ -10,7 +9,6 @@ const app = express();
 app.use(express.json());
 // app.use(express.bodyParser());
 
-app.use("/api", userRouter);
 app.use("/api", tourRouter);
 app.use("/api", authRouter);
 app.use("/api", bookingRouter);

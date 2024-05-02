@@ -4,27 +4,20 @@ class TourController {
   async getTours(req, res) {
     try {
       const search = req.query.query;
-      const level = req.query.level;
+      const level = Number(req.query.level);
       let query;
+
       if (search) {
-        query = await db.query(
-          `SELECT * FROM tours WHERE to_tsvector(name) @@ to_tsquery($1)`,
-          [search]
-        );
-        console.log("here 1");
+        query = await db.query(`SELECT * FROM tours WHERE name LIKE $1`, [
+          "%" + search + "%",
+        ]);
+        console.log("here ", search, query.rows);
       } else {
         query = await db.query(
           `SELECT tours.*, levels.points, levels.id as levels_id, levels.name as levels_name  FROM tours INNER JOIN levels ON tours.level_id = levels.id WHERE points = $1`,
           [level]
         );
-        // query = await db.query(
-        //   `SELECT * FROM tours INNER JOIN levels ON tours.level_id = levels.id WHERE ( $1 IS NULL OR level = $1)`,
-        //   [level]
-        // );
-
-        console.log("here 2");
       }
-      console.log("query.rows", query.rows);
       res.json(query.rows);
     } catch (error) {
       console.log(error);
@@ -100,7 +93,6 @@ class TourController {
 
   async uploadTourImage(req, res) {
     const tourId = req.params.id;
-    console.log("upload iMage", req.file);
     const url = req.file.path;
     try {
       const query = await db.query(

@@ -25,7 +25,6 @@ router.post(
 );
 router.post("/tours", authMiddleware, tourController.createTour);
 router.delete("/tours/:id", authMiddleware, tourController.deleteTour);
-router.put("/tours/:id", authMiddleware, tourController.updateTour);
 
 const tourRouter = router;
 

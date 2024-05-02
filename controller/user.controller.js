@@ -4,24 +4,12 @@ import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 const { sign, verify } = jwt;
 
-const generateAccessToken = (id, roleId) => {
-  return sign({ id, roleId }, process.env.TOKEN_SECRET, { expiresIn: "24h" });
+const generateAccessToken = (id, roleId, roleName) => {
+  return sign({ id, roleId, roleName }, process.env.TOKEN_SECRET, {
+    expiresIn: "24h",
+  });
 };
 class UserController {
-  async createUser(req, res) {
-    const { name, email, password, phone, roleId } = req.body;
-
-    try {
-      const query = await db.query(
-        `INSERT INTO users (name, email, password, phone, role_id) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-        [name, email, password, phone, roleId]
-      );
-      res.json(query.rows[0]);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-
   async signUp(req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -46,12 +34,12 @@ class UserController {
         `INSERT INTO users (name, email, password, phone, role_id) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
         [name, email, hashedPassword, phone, userRoleId]
       );
-      // const query2 = await db.query(`select users.*, roles.name as role_name from users join roles on users.role_id = roles.id where users.id = $1`, [query.rows[0].id])
-      // select users.*, roles.name as role_name from users join roles on users.role_id = roles.id where users.id = 
+
       const user = query.rows[0];
       const token = generateAccessToken(user.id, user.role_id);
       res.status(200).json({ token, user: user });
     } catch (error) {
+      console.log("error", error);
       res.status(500).json({ message: error.message });
     }
   }
@@ -65,7 +53,8 @@ class UserController {
     }
     const { email, password } = req.body;
     try {
-      const query = "SELECT * FROM users WHERE email = $1";
+      const query =
+        "SELECT users.*, roles.name as role_name FROM users JOIN roles ON users.role_id = roles.id WHERE email = $1";
       const result = await db.query(query, [email]);
       if (result.rows.length === 0) {
         // User with provided email not found
@@ -78,7 +67,7 @@ class UserController {
         // Passwords don't match
         return res.status(401).send("Invalid email or password");
       }
-      const token = generateAccessToken(user.id, user.role_id);
+      const token = generateAccessToken(user.id, user.role_id, user.role_name);
       // Passwords match, sign-in successful
       res.status(200).json({ token, user: user });
     } catch (error) {
@@ -95,6 +84,7 @@ class UserController {
       res.status(500).json({ message: error.message });
     }
   }
+
   async updateUser(req, res) {
     const id = req.params.id;
     const { name, email, password, phone } = req.body;

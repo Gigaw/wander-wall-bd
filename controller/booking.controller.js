@@ -3,9 +3,14 @@ import db from "../db.js";
 class Booking {
   async getBookings(req, res) {
     try {
-      const query = await db.query(`SELECT * FROM bookings`);
+      const query = await db.query(
+        `SELECT bookings.*, statuses.name as status_name, tours.name as tour_name, users.name as user_name, users.phone as user_phone FROM bookings INNER JOIN statuses ON bookings.status_id = statuses.id INNER JOIN tours ON bookings.tour_id = tours.id INNER JOIN users ON bookings.user_id = users.id WHERE statuses.name = $1`,
+        ["Pending"]
+      );
+      // console.log("query.rows", query.rows);
       res.json(query.rows);
     } catch (error) {
+      console.log(error);
       res.status(500).json({ message: error.message });
     }
   }
@@ -74,6 +79,34 @@ class Booking {
       res.json(query.rows[0]);
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  }
+
+  async rejectBooking(req, res) {
+    const id = req.params.id;
+    try {
+      const query = await db.query(
+        `UPDATE bookings SET status_id = 3 WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      res.json(query.rows[0]);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "server error" });
+    }
+  }
+  async approveBooking(req, res) {
+    const id = req.params.id;
+    console.log("here", id);
+    try {
+      const query = await db.query(
+        `UPDATE bookings SET status_id = 2 WHERE id = $1 RETURNING *`,
+        [id]
+      );
+      res.json(query.rows[0]);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "server error" });
     }
   }
 }
