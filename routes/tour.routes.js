@@ -17,14 +17,14 @@ const upload = Multer({ storage: storage });
 const router = new Router();
 
 router.get("/tours", tourController.getTours);
-router.get("/tours/:id", authMiddleware, tourController.getTour);
+router.get("/tours/:id", tourController.getTour);
 router.post(
   "/tours/upload-img/:id",
   upload.single("image"),
   tourController.uploadTourImage
 );
-router.post("/tours", authMiddleware, tourController.createTour);
-router.delete("/tours/:id", authMiddleware, tourController.deleteTour);
+router.post("/tours", authMiddleware('admin'), tourController.createTour);
+router.delete("/tours/:id", authMiddleware('admin'), tourController.deleteTour);
 
 const tourRouter = router;
 
