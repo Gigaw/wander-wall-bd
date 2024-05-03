@@ -18,9 +18,10 @@ class Booking {
   async getBooking(req, res) {
     try {
       const tour_id = req.params.tour_id;
+      const user = req.user;
       const query = await db.query(
-        `SELECT * FROM bookings WHERE tour_id = $1`,
-        [tour_id]
+        `SELECT * FROM bookings WHERE tour_id = $1 AND user_id = $2`,
+        [tour_id, user.id]
       );
       if (query.rowCount !== 0) {
         res.json(query.rows[0]);
