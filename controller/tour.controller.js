@@ -71,6 +71,9 @@ class TourController {
     const id = req.params.id;
     try {
       const query = await db.query(`DELETE FROM tours WHERE id = $1`, [id]);
+      const query2 = await db.query("DELETE FROM bookings WHERE tour_id = $1", [
+        id,
+      ]);
       res.json({ message: "Tour deleted" });
     } catch (error) {
       res.status(500).json({ message: error.message });
