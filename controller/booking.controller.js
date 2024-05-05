@@ -65,6 +65,7 @@ class Booking {
       const query = await db.query(`DELETE FROM bookings WHERE id = $1`, [id]);
       res.json({ message: "Booking deleted" });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ message: error.message });
     }
   }
